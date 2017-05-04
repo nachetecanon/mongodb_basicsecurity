@@ -1,0 +1,8 @@
+version: '2'
+services:
+  mongoalpine:
+    build: .
+    environment:
+      - --config /etc/mongod.conf
+    ports:
+      - "27017:27017"
