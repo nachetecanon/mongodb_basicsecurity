@@ -1,8 +1,8 @@
 version: '2'
 services:
-  mongoalpine:
+  mongoconf:
     build: .
-    environment:
-      - --config /etc/mongod.conf
+    image: mongoconf
     ports:
       - "27017:27017"
+
