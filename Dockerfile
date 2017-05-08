@@ -66,19 +66,23 @@ RUN set -x \
 RUN mkdir -p /data/db /data/configdb \
 	&& chown -R mongodb:mongodb /data/db /data/configdb
 
-RUN mkdir -p /srv/mongodb && \
-   openssl rand -base64 741 > /srv/mongodb/mongodb-keyfile && \
-   chmod 600 /srv/mongodb/mongodb-keyfile && \
-   chown mongodb:mongodb /srv/mongodb/mongodb-keyfile
+RUN mkdir -p /srv/mongodb
 
-COPY mongod.conf /etc/
+COPY mongod.yaml /srv/mongodb
 VOLUME /data/db /data/configdb
 
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY ssl.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh && \
-    chmod +x /entrypoint.sh && chown mongodb:mongodb /entrypoint.sh
+    chmod +x /entrypoint.sh /usr/local/bin/ssl.sh && chown mongodb:mongodb /entrypoint.sh
+
+ENV MONGO_INITDB_ROOT_USERNAME "mongoAdmin"
+ENV MONGO_INITDB_ROOT_PASSWORD "tdhrqPcCvdU+0HWEcg=="
+
 ENTRYPOINT ["/entrypoint.sh"]
+
+RUN chown mongodb:mongodb /srv/mongodb
 
 EXPOSE 27017
 
-CMD ["mongod","-f","/etc/mongod.conf"]
+CMD ["mongod","--sslMode","allowSSL","--sslPEMKeyFile","/srv/mongodb/mongodb.pem", "-f","/srv/mongodb/mongod.yaml"]
