@@ -201,6 +201,35 @@ if [ "$originalArgOne" = 'mongod' ]; then
 			)
 		fi
 
+		if [ "$MONGO_INITDB_SSL" ] ; then
+			rootAuthDatabase='admin'
+			echo "Generating key for $host"
+  	        openssl genrsa  -out /srv/mongodb/mongodb.key 2048
+	        openssl req -new -days 365 -key /srv/mongodb/mongodb.key -out /srv/mongodb/mongodb.csr -subj "$dn_prefix/OU=server/CN=$(hostname)"
+	        openssl ca -batch -name SigningCA -config root-ca.cfg -out /srv/mongodb/mongodb.crt -infiles /srv/mongodb/mongodb.csr
+	        cat /srv/mongodb/mongodb.crt /srv/mongodb/mongodb.key > /srv/mongodb/mongodbhost.pem
+			# obtain the subject from the client key:
+            client_subject=`openssl x509 -in /srv/mongodb/mongodbhost.pem -inform PEM -subject -nameopt RFC2253 | grep subject | awk '{sub("subject= ",""); print}'`
+			# modification for ADMIN user
+			"${mongo[@]}" "$rootAuthDatabase" <<-EOJS
+				db.createUser({
+				    createUser: $(jq --arg 'createUser' "$client_subject" --null-input '$createUser'),
+					roles: [
+					    { role: 'userAdminAnyDatabase', db: $(jq --arg 'db' "$rootAuthDatabase" --null-input '$db') },
+					    { role: 'dbAdminAnyDatabase', db: $(jq --arg 'db' "$rootAuthDatabase" --null-input '$db') },
+					    { role: 'readWriteAnyDatabase', db: $(jq --arg 'db' "$rootAuthDatabase" --null-input '$db') },
+					    { role: 'clusterAdmin', db: $(jq --arg 'db' "$rootAuthDatabase" --null-input '$db') }
+					]
+				})
+			EOJS
+
+			mongo+=(
+				--username="$MONGO_INITDB_ROOT_USERNAME"
+				--password="$MONGO_INITDB_ROOT_PASSWORD"
+				--authenticationDatabase="$rootAuthDatabase"
+			)
+		fi
+
 		export MONGO_INITDB_DATABASE="${MONGO_INITDB_DATABASE:-test}"
 
 		echo
@@ -227,6 +256,6 @@ if [ "$originalArgOne" = 'mongod' ]; then
 	unset MONGO_INITDB_DATABASE
 fi
 
-. ssl.sh
+
 
 exec "$@"

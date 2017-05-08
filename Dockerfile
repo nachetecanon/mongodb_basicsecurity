@@ -72,12 +72,16 @@ COPY mongod.yaml /srv/mongodb
 VOLUME /data/db /data/configdb
 
 COPY docker-entrypoint.sh /usr/local/bin/
-COPY ssl.sh /usr/local/bin/
+COPY generateCA_ssl.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh && \
-    chmod +x /entrypoint.sh /usr/local/bin/ssl.sh && chown mongodb:mongodb /entrypoint.sh
+    chmod +x /entrypoint.sh /usr/local/bin/*.sh && \
+    chown mongodb:mongodb /entrypoint.sh && \
+    . generateCA_ssl.sh
 
-ENV MONGO_INITDB_ROOT_USERNAME "mongoAdmin"
-ENV MONGO_INITDB_ROOT_PASSWORD "tdhrqPcCvdU+0HWEcg=="
+
+
+ENV MONGO_INITDB_SSL "mongoAdmin"
+ENV dn_prefix="/C=ES/ST=Madrid/L=Madrid/O=BBVA/OU=BBVA"
 
 ENTRYPOINT ["/entrypoint.sh"]
 
@@ -85,4 +89,11 @@ RUN chown mongodb:mongodb /srv/mongodb
 
 EXPOSE 27017
 
-CMD ["mongod","--sslMode","allowSSL","--sslPEMKeyFile","/srv/mongodb/mongodb.pem", "-f","/srv/mongodb/mongod.yaml"]
+CMD ["mongod",\
+    "--sslMode","requireSSL", \
+    "--sslPEMKeyFile","/srv/mongodb/mongodbhost.pem", \
+    "--clusterAuthMode","x509", \
+    "--sslCAFile","/srv/mongodb/RootCA/root-ca.pem", \
+    "--sslAllowInvalidHostnames", \
+    "--sslClusterFile","/srv/mongodb/mongodbhost.pem", \
+    "--replSet","rs0"]

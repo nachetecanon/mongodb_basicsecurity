@@ -2,12 +2,12 @@
 # script customized using as base script the one published at
 # https://www.mongodb.com/blog/post/secure-mongodb-with-x-509-authentication
 
-OUTPUT_DIR=.
+OUTPUT_DIR=/srv/mongodb
 
 #/srv/mongodb
 EXPIRATION=3650
 
-dn_prefix="/C=ES/ST=Madrid/L=Madrid/O=BBVA/OU=BBVA"
+
 
 cd $OUTPUT_DIR
 echo "##### STEP 1: Generate root CA "
