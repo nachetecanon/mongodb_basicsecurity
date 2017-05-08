@@ -72,9 +72,8 @@ COPY mongod.yaml /srv/mongodb
 VOLUME /data/db /data/configdb
 
 COPY docker-entrypoint.sh /usr/local/bin/
-COPY ssl.sh /usr/local/bin/
 RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh && \
-    chmod +x /entrypoint.sh /usr/local/bin/ssl.sh && chown mongodb:mongodb /entrypoint.sh
+    chmod +x /entrypoint.sh  && chown mongodb:mongodb /entrypoint.sh
 
 ENV MONGO_INITDB_ROOT_USERNAME "mongoAdmin"
 ENV MONGO_INITDB_ROOT_PASSWORD "tdhrqPcCvdU+0HWEcg=="
@@ -85,4 +84,4 @@ RUN chown mongodb:mongodb /srv/mongodb
 
 EXPOSE 27017
 
-CMD ["mongod","--sslMode","allowSSL","--sslPEMKeyFile","/srv/mongodb/mongodb.pem", "-f","/srv/mongodb/mongod.yaml"]
+CMD ["mongod","--auth"]
