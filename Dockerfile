@@ -87,4 +87,4 @@ RUN chown mongodb:mongodb /srv/mongodb
 
 EXPOSE 27017
 
-CMD ["mongod", "--auth"]
+CMD ["mongod"]
