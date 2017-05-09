@@ -78,6 +78,8 @@ RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh && \
 ENV MONGO_INITDB_ROOT_USERNAME "mongoAdmin"
 ENV MONGO_INITDB_ROOT_PASSWORD "pass"
 
+RUN export MONGO_INITDB_ROOT_PASSWORD=$(apg -n 1 -m 25 -q) && \
+    echo  "$MONGO_INITDB_ROOT_PASSWORD" > /srv/mongodb/pwd
 
 ENTRYPOINT ["/entrypoint.sh"]
 

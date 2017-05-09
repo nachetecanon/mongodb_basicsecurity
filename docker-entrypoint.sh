@@ -181,9 +181,7 @@ if [ "$originalArgOne" = 'mongod' ]; then
 
 		if [ "$MONGO_INITDB_ROOT_USERNAME" ] && [ "$MONGO_INITDB_ROOT_PASSWORD" ]; then
 			rootAuthDatabase='admin'
-			export MONGO_INITDB_ROOT_PASSWORD=$(apg -n 1 -m 25 -q)
-			echo  "$MONGO_INITDB_ROOT_PASSWORD" > /srv/mongodb/pwd
-			echo "admin pwd saved to /srv/mongodb/pwd"
+			export MONGO_INITDB_ROOT_PASSWORD=$(cat /srv/mongodb/pwd)
 			# modification for ADMIN user
 			"${mongo[@]}" "$rootAuthDatabase" <<-EOJS
 				db.createUser({
