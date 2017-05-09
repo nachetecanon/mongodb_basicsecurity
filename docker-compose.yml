@@ -2,7 +2,7 @@ version: '2'
 services:
   mongoconf:
     build: .
-    image: mongoconf
+    image: mongodb_basicsecurity
     ports:
       - "27017:27017"
 
