@@ -1,3 +1,7 @@
+# MongoDB docker image
+
+This image is based upon the original/official image from MongoDB at 
+
 Run like this
 
     mongo -u "mongoAdmin" -p "tdhrqPcCvdU+0HWEcg==" --authenticationDatabase "admin"

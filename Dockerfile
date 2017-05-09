@@ -11,6 +11,7 @@ RUN apt-get update \
 		ca-certificates \
 		jq \
 		numactl \
+		apg \
 	&& rm -rf /var/lib/apt/lists/*
 
 
@@ -68,7 +69,6 @@ RUN mkdir -p /data/db /data/configdb \
 
 RUN mkdir -p /srv/mongodb
 
-COPY mongod.yaml /srv/mongodb
 VOLUME /data/db /data/configdb
 
 COPY docker-entrypoint.sh /usr/local/bin/
@@ -76,7 +76,8 @@ RUN ln -s usr/local/bin/docker-entrypoint.sh /entrypoint.sh && \
     chmod +x /entrypoint.sh  && chown mongodb:mongodb /entrypoint.sh
 
 ENV MONGO_INITDB_ROOT_USERNAME "mongoAdmin"
-ENV MONGO_INITDB_ROOT_PASSWORD "tdhrqPcCvdU+0HWEcg=="
+ENV MONGO_INITDB_ROOT_PASSWORD "pass"
+
 
 ENTRYPOINT ["/entrypoint.sh"]
 
